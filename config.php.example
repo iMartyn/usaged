@@ -1,0 +1,5 @@
+<?php
+define('DB_USERNAME', 'rootofcourse');
+define('DB_PASSWORD', 'yerite!');
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'usaged');

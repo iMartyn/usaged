@@ -1,0 +1,19 @@
+<DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Machines available</title>
+    </head>
+    <body>
+{% if machines %}
+        <h1>Machines : </h1>
+        <ul>
+{% for machine in machines %}
+            <li> {{ machine.machinename }} </li>
+{% endfor %}
+        </ul>
+{% else %}
+        <h1>No machines available!</h1>
+{% endif %}
+    </body>
+</html>
