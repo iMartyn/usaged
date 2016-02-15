@@ -53,4 +53,16 @@ Class Machine {
         }
         return $results;
     }
+
+    public function getById($uid) {
+        $results = null;
+        $query = $this->db->prepare('SELECT uid,machinename FROM machines WHERE uid = :uid LIMIT 1');
+        $query->bindParam(':uid',$uid);
+        if ($query->execute()) {
+            while ($result = $query->fetch()) {
+                $results = array('uid'=>$result['uid'],'machinename'=>$result['machinename']);
+            }
+        }
+        return $results;
+    }
 }

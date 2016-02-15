@@ -6,6 +6,7 @@ use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
 use Usaged\Database;
 use Usaged\Machine;
 use Usaged\Inductee;
+use Usaged\InducteeMachine;
 
 // Helpers
 
@@ -152,6 +153,61 @@ $app->get('/canuse/:name/:cardid', function ($name,$cardid) use ($app) {
             $app->response->setStatus(403);
             echo 'false';
         }
+    }
+});
+
+$app->get('/induct/:inductoruid', function ($inductoruid) use ($app) {
+    $db = new Database;
+    $machine = new Machine($db);
+    $inductor = new Inductee($db);
+    if ($inductor->canInductOthers($inductoruid)) {
+        $app->render('inductform.html', array('machines'=>$machine->getAll(),'inductoruid'=>$inductoruid));
+    } else {
+        $app->response->setStatus(403);
+        echo 'Sorry, I\'ve not been told you can induct people, see Martyn!';
+    }
+});
+
+$app->post('/inductmember', function () use ($app) {
+    $db = new Database;
+    $machine = new Machine($db);
+    $machineuid = $app->request->post('machine');
+    $machinedetail = $machine->getById($machineuid);
+    if (!$machinedetail) {
+        $app->response->setStatus(400);
+        echo 'Seems you do not rembember the machine uid off the top of your head.';
+        return false;
+    }
+    $inductor = new Inductee($db);
+    $inductoruid = $app->request->post('inductor');
+    if ($inductor->canInductOthers($inductoruid)) {
+        $inducteeuid = $inductor->getUidByCard($app->request->post('cardid'));
+        if (!$inducteeuid) {
+            $inductee = $inductor->createInductee($app->request->post('membername'),$app->request->post('cardid'));
+            if ($inductee) {
+                $inducteeuid = $inductee['uid'];
+            } else {
+                $app->response->setStatus(500);
+                echo 'Could not create new inductee!';
+                return false;
+            }
+        }
+        $inducteedetail = $inductor->getById($inducteeuid)[0];
+        $inductordetail = $inductor->getById($inductoruid)[0];
+        $linker = new InducteeMachine($db);
+        try {
+        $linker->inductMachine($inducteeuid,$machineuid,$inductoruid);
+        } catch ( Exception $e ) {}
+        $memberdetails = array();
+        foreach ($linker->getAllInducted($machineuid) as $member) {
+            $memberdetails[] = $inductor->getById($member['memberuid'])[0];
+        }
+        $renderdata = array('test'=>'hello','members'=>$memberdetails,'inductor'=>$inductordetail,'inductee'=>$inducteedetail,'machine'=>$machinedetail);
+        $app->log->debug(json_encode($renderdata));
+        $app->render('inducted.html', $renderdata);
+    } else {
+        $app->response->setStatus(403);
+        echo 'Sorry, I\'ve not been told you can induct people, see Martyn!';
     }
 });
 

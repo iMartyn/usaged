@@ -32,6 +32,17 @@ $options = array(
             $result = $query->execute();
             $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
         }
+        $query = $this->pdo->prepare('SELECT caninduct FROM inductees LIMIT 1');
+        $result = $query->execute();
+        $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
+        if ($result !== TRUE) {
+            $this->app->log->debug('adding caninduct to inductees');
+            $query = $this->pdo->prepare('ALTER TABLE `inductees` ADD COLUMN (
+                `caninduct` boolean NOT NULL DEFAULT FALSE
+            )');
+            $result = $query->execute();
+            $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
+        }
         $query = $this->pdo->prepare('SELECT uid,membername,cardid FROM inductees LIMIT 1');
         $result = $query->execute();
         $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
