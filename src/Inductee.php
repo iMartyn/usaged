@@ -54,7 +54,8 @@ Class Inductee {
     }
 
     public function cardCanUseMachine($cardid,$machineid) {
-        $query = $this->db->prepare('SELECT cardid FROM inductees LEFT JOIN inducteemachine ON inductees.uid = inducteemachine.memberuid WHERE cardid = :cardid');
+        $query = $this->db->prepare('SELECT cardid FROM inductees LEFT JOIN inducteemachine ON inductees.uid = inducteemachine.memberuid WHERE cardid = :cardid and machineuid = :machineid');
+        $this->app->log->debug($query->queryString);
         $query->bindParam(':cardid',$cardid);
         $query->bindParam(':machineid',$machineid);
         $query->execute();
