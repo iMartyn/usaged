@@ -114,7 +114,7 @@ $app->get('/inductees', function () use ($app) {
 });
 
 /**
- * Machine Registration
+ * Inductee Registration
  * url - /inductee/create
  * method - POST
  * params - machinename
