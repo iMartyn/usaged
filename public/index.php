@@ -136,5 +136,24 @@ $app->post('/inductee/create', function () use ($app) {
     echo json_encode($response);
 });
 
+$app->get('/canuse/:name/:cardid', function ($name,$cardid) use ($app) {
+    $db = new Database;
+    $inductee = new Inductee($db);
+    $machine = new Machine($db);
+    $machineid = $machine->getByName($name)['uid'];
+    if (!$machineid) {
+        $app->response->setStatus(500);
+        echo 'false';
+    } else {
+        $app->log->debug('Machine : '.$machineid);
+        if ($inductee->cardCanUseMachine($cardid,$machineid)) {
+            echo 'true';
+        } else {
+            $app->response->setStatus(403);
+            echo 'false';
+        }
+    }
+});
+
 // Run app
 $app->run();

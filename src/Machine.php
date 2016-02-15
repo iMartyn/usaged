@@ -41,4 +41,16 @@ Class Machine {
             throw (new RuntimeException('Some database error occurred'));
         }
     }
+
+    public function getByName($machinename) {
+        $results = null;
+        $query = $this->db->prepare('SELECT uid,machinename FROM machines WHERE machinename = :machinename LIMIT 1');
+        $query->bindParam(':machinename',$machinename);
+        if ($query->execute()) {
+            while ($result = $query->fetch()) {
+                $results = array('uid'=>$result['uid'],'machinename'=>$result['machinename']);
+            }
+        }
+        return $results;
+    }
 }
