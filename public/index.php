@@ -3,8 +3,9 @@ $loader = require '../vendor/autoload.php';
 //require '../src/Machine.php';
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
-use Usaged\Machine;
 use Usaged\Database;
+use Usaged\Machine;
+use Usaged\Inductee;
 
 // Helpers
 
@@ -96,6 +97,36 @@ $app->post('/machine/create', function () use ($app) {
     $status = 200;
     try {
         $response = $machine->createMachine($app->request->post('machinename'));
+    } catch (Exception $e) {
+        $response['error'] = $e->getMessage();
+        $status = 500;
+    }
+    $app->status($status);
+    $app->contentType('appliaction/json');
+    echo json_encode($response);
+});
+
+$app->get('/inductees', function () use ($app) {
+    $db = new Database;
+    $members = new Inductee($db);
+    $app->log->debug('Members who can use machines : ' . var_export($members->getAll(),true));
+    $app->render('inductees.html',array('inductees'=>$members->getAll()));
+});
+
+/**
+ * Machine Registration
+ * url - /inductee/create
+ * method - POST
+ * params - machinename
+ */
+$app->post('/inductee/create', function () use ($app) {
+    verifyRequiredParams(array('membername','cardid'));
+    $db = new Database;
+    $inductee = new Inductee($db);
+    $app->log->debug('Members who can use machines : ' . var_export($inductee->getAll(),true));
+    $status = 200;
+    try {
+        $response = $inductee->createInductee($app->request->post('membername'),$app->request->post('cardid'));
     } catch (Exception $e) {
         $response['error'] = $e->getMessage();
         $status = 500;
