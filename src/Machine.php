@@ -39,7 +39,7 @@ Class Machine {
         if ($query->execute()) {
             return($response);
         } else {
-            throw (new RuntimeException('Some database error occurred'));
+            throw (new \RuntimeException('Some database error occurred'));
         }
     }
 
