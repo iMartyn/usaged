@@ -14,6 +14,7 @@ Class Machine {
     }
 
     public function getAll() {
+        $results = array();
         $query = $this->db->prepare('SELECT uid,machinename FROM machines');
         if ($query->execute()) {
             while ($result = $query->fetch()) {
