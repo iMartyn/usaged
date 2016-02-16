@@ -26,7 +26,7 @@ Class Machine {
     public function createMachine($machinename) {
         $response = array();
         try {
-            $response['uid'] = UUid::uuid5(Uuid::NAMESPACE_DNS, 'usage.ranyard.info')->toString();
+            $response['uid'] = UUid::uuid5(Uuid::NIL, 'usage.ranyard.info'.$machinename)->toString();
         } catch (UnsatisfiedDependencyException $e) {
             $response['error'] = $e->getMessage();
             $status = 500;
