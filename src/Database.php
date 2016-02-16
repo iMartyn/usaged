@@ -68,6 +68,20 @@ $options = array(
             $result = $query->execute();
             $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
         }
+        $query = $this->pdo->prepare('SELECT inducteeuid,machineuid,starttime,endtime FROM logs');
+        $result = $query->execute();
+        $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
+        if ($result !== TRUE) {
+            $this->app->log->debug('creating logs');
+            $query = $this->pdo->prepare('CREATE TABLE `logs` (
+                `inducteeuid` varchar(36) NOT NULL,
+                `machineuid` varchar(36) NOT NULL,
+                `starttime` datetime  NOT NULL,
+                `endtime` datetime  NOT NULL,
+                PRIMARY KEY (`inducteeuid`,`machineuid`,`starttime`))');
+            $result = $query->execute();
+            $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
+        }
     }
 
     public function __destruct() {

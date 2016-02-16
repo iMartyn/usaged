@@ -7,6 +7,7 @@ use Usaged\Database;
 use Usaged\Machine;
 use Usaged\Inductee;
 use Usaged\InducteeMachine;
+use Usaged\Logger;
 
 // Helpers
 
@@ -37,8 +38,7 @@ function verifyRequiredParams($required_fields) {
         $app = \Slim\Slim::getInstance();
         $response["error"] = true;
         $response["message"] = 'Required field(s) ' . substr($error_fields, 0, -2) . ' is missing or empty';
-        echoRespnse(400, $response);
-        $app->stop();
+        $app->halt(400, json_encode($response));
     }
 }
 
@@ -103,7 +103,7 @@ $app->post('/machine/create', function () use ($app) {
         $status = 500;
     }
     $app->status($status);
-    $app->contentType('appliaction/json');
+    $app->contentType('application/json');
     echo json_encode($response);
 });
 
@@ -133,7 +133,7 @@ $app->post('/inductee/create', function () use ($app) {
         $status = 500;
     }
     $app->status($status);
-    $app->contentType('appliaction/json');
+    $app->contentType('application/json');
     echo json_encode($response);
 });
 
@@ -209,6 +209,28 @@ $app->post('/inductmember', function () use ($app) {
         $app->response->setStatus(403);
         echo 'Sorry, I\'ve not been told you can induct people, see Martyn!';
     }
+});
+
+/**
+ * Log the thing!
+ * url - /log/bycard/:cardid
+ * method - POST
+ * params - machinename
+ */
+$app->post('/log/bycard/:cardid', function ($cardid) use ($app) {
+    verifyRequiredParams(array('machineuid','starttime','endtime'));
+    $db = new Database;
+    $log = new Logger($db);
+    $status = 200;
+    try {
+        $response = $log->cardCreateLog($cardid,$app->request->post('machineuid'),$app->request->post('starttime'),$app->request->post('endtime'));
+    } catch (Exception $e) {
+        $response['error'] = $e->getMessage();
+        $status = 500;
+    }
+    $app->status($status);
+    $app->contentType('application/json');
+    echo json_encode($response);
 });
 
 // Run app
