@@ -47,7 +47,7 @@ Class Logger {
     }
 
     public function getByMachineId($machineuid, $limit = 10) {
-        $querystring = 'SELECT inducteeuid,machineuid,starttime,endtime FROM logs WHERE machineuid = :machineuid ORDER BY starttime DESC';
+        $querystring = 'SELECT inducteeuid,machineuid,starttime,endtime,endtime-starttime seconds FROM logs WHERE machineuid = :machineuid ORDER BY starttime DESC';
         if (is_numeric($limit) && $limit > 0) {
             $querystring .= ' LIMIT '.$limit;
         }
@@ -59,19 +59,17 @@ Class Logger {
         if ($query->execute()) {
             while ($result = $query->fetch()) {
                 $thisresult = array('inducteeuid'=>$result['inducteeuid'],'starttime'=>$result['starttime'],'endtime'=>$result['endtime']);
-                $startDatetime = new \DateTime($result['starttime']);
-                $endDatetime = new \DateTime($result['endtime']);
-                $interval = $startDatetime->diff($endDatetime);
-                $secs = $interval->format('%s');
+                $secs = $result['seconds'];
                 $thisresult['seconds'] = $secs;
-                $thisresult['nicetime'] = $secs.' seconds';
+                $this->app->log->debug($secs);
+                $thisresult['nicetime'] = sprintf('%u seconds',$secs);
                 if ($secs > 60) {
-                   list($mins,$secs) = explode(',',$interval->format('%m,%s'),2);
+                   list($mins,$secs) =explode(',',date('i,s',$secs),2);
                    if ($mins > 60) {
-                       list($hours,$mins,$secs) = explode(',',$interval->format('%h,%m,%s'),3);
-                       $thisresult['nicetime'] = $hours.' hours, '.$mins.' minutes and '.$secs.' seconds';
+                       list($hours,$mins,$secs) = explode(',',date('H,i,s',$secs),3);
+                       $thisresult['nicetime'] = sprintf('%u hours, %u minutes and %u seconds',$hours,$mins,$secs);
                    } else {
-                       $thisresult['nicetime'] = $mins.' minutes and '.$secs.' seconds';
+                       $thisresult['nicetime'] = sprintf('%u minutes and %u seconds',$mins,$secs);
                    }
 		}
                 $results[] = $thisresult;
