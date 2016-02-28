@@ -1,0 +1,21 @@
+<DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Last usage of tool by members</title>
+    </head>
+    <body>
+{% if usage %}
+        <h1>Usage : </h1>
+        <h2>Last usage {{ lastlogline.nicetime }} by {{ lastlogline.inductee }}</h2>
+        <h3>Previous usage : </h3>
+        <ul>
+{% for logline in usage %}
+            <li> {{ logline.inductee }} used {{ logline.nicetime }} at {{ logline.endtime }} </li>
+{% endfor %}
+        </ul>
+{% else %}
+        <h1>No logs available!</h1>
+{% endif %}
+    </body>
+</html>
