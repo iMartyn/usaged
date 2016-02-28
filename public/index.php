@@ -246,14 +246,22 @@ $app->get('/lastlog/:machinename', function ($machinename) use ($app) {
     foreach ($usagedata as $line) {
         $newline = array();
         $newline['inducteeuid'] = $line['inducteeuid'];
-        $newline['inductee'] = $inductee->getById($line['inducteeuid'])[0]['membername'];
+        $inducteedetail = $inductee->getById($line['inducteeuid']);
+        if (is_array($inducteedetail)) {
+            $inducteename = $inducteedetail[0]['membername'];
+        }
+        $newline['inductee'] = $inducteename;
         $newline['starttime'] = $line['starttime'];
         $newline['endtime'] = $line['endtime'];
         $newline['seconds'] = $line['seconds'];
         $newline['nicetime'] = $line['nicetime'];
         $renderthis[] = $newline;
     }
-    $renderdata = array('usage'=>$renderthis,'lastlogline'=>$renderthis[0]);
+    if (empty($renderthis)) {
+        $renderdata = array();
+    } else {
+        $renderdata = array('usage'=>$renderthis,'lastlogline'=>$renderthis[0]);
+    }
     $app->log->debug(json_encode($renderdata));
     $app->render('lastusage.html', $renderdata);
 });
