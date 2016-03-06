@@ -120,6 +120,7 @@ $app->get('/inductees', function () use ($app) {
  * method - POST
  * params - machinename
  */
+/*  This function disabled until we have security.
 $app->post('/inductee/create', function () use ($app) {
     verifyRequiredParams(array('membername','cardid'));
     $db = new Database;
@@ -135,7 +136,7 @@ $app->post('/inductee/create', function () use ($app) {
     $app->status($status);
     $app->contentType('application/json');
     echo json_encode($response);
-});
+});*/
 
 $app->get('/canuse/:name/:cardid', function ($name,$cardid) use ($app) {
     $db = new Database;
