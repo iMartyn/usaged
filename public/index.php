@@ -161,7 +161,7 @@ $app->get('/induct/:inductoruid', function ($inductoruid) use ($app) {
     $machine = new Machine($db);
     $inductor = new Inductee($db);
     if ($inductor->canInductOthers($inductoruid)) {
-        $app->render('inductform.html', array('machines'=>$machine->getAll(),'inductoruid'=>$inductoruid));
+        $app->render('inductform.html', array('machines'=>$inductor->getInductorMachines($inductoruid),'inductoruid'=>$inductoruid));
     } else {
         $app->response->setStatus(403);
         echo 'Sorry, I\'ve not been told you can induct people, see Martyn!';

@@ -77,11 +77,26 @@ Class Inductee {
     }
 
     public function canInductOthers($uid) {
-        $query = $this->db->prepare('SELECT caninduct FROM inductees WHERE uid = :uid AND caninduct = 1');
+        $query = $this->db->prepare('SELECT caninduct FROM inductees LEFT JOIN inducteemachine ON inductees.uid = inducteemachine.memberuid WHERE uid = :uid AND caninduct = 1');
         $this->app->log->debug($query->queryString);
         $query->bindParam(':uid',$uid);
         $query->execute();
         return ($query->rowCount() > 0);
+    }
+
+    public function getInductorMachines($uid) {
+        $query = $this->db->prepare('SELECT machineuid,machinename FROM inductees LEFT JOIN inducteemachine ON inductees.uid = inducteemachine.memberuid LEFT JOIN machines on machines.uid = inducteemachine.machineuid WHERE inductees.uid = :uid AND caninduct = 1');
+        $this->app->log->debug($query->queryString);
+        $query->bindParam(':uid',$uid);
+        $query->execute();
+        if ($query->rowCount() > 0) {
+            while ($result = $query->fetch()) {
+                $results[] = array('machineuid'=>$result['machineuid'],'machinename'=>$result['machinename']);
+            }
+            return $results;
+        } else {
+            return false;
+        }        
     }
 
     public function getUidByCard($cardid) {
