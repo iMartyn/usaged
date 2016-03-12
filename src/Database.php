@@ -86,6 +86,19 @@ $options = array(
             $result = $query->execute();
             $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
         }
+        $query = $this->pdo->prepare('SELECT uid,cardid,description FROM specialcards');
+        $result = $query->execute();
+        $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
+        if ($result !== TRUE) {
+            $this->app->log->debug('creating inducteemachine');
+            $query = $this->pdo->prepare('CREATE TABLE `specialcards` (
+                `uid` varchar(36) NOT NULL,
+                `cardid` varchar(8) NOT NULL,
+                `description` varchar(255) NOT NULL,
+                PRIMARY KEY (`uid`))');
+            $result = $query->execute();
+            $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
+        }
     }
 
     public function __destruct() {

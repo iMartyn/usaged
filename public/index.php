@@ -8,6 +8,7 @@ use Usaged\Machine;
 use Usaged\Inductee;
 use Usaged\InducteeMachine;
 use Usaged\Logger;
+use Usaged\SpecialCard;
 
 // Helpers
 
@@ -142,6 +143,7 @@ $app->get('/canuse/:name/:cardid', function ($name,$cardid) use ($app) {
     $db = new Database;
     $inductee = new Inductee($db);
     $machine = new Machine($db);
+    $specialcard = new SpecialCard($db);
     $machineid = $machine->getByName($name)['uid'];
     if (!$machineid) {
         $app->response->setStatus(500);
@@ -151,8 +153,14 @@ $app->get('/canuse/:name/:cardid', function ($name,$cardid) use ($app) {
         if ($inductee->cardCanUseMachine($cardid,$machineid)) {
             echo 'true';
         } else {
-            $app->response->setStatus(403);
-            echo 'false';
+            $specialarray = $specialcard->getByCardId($cardid);
+            $app->log->debug(json_encode($specialarray));
+            if ($specialarray) {
+                echo '{"special": "'.$specialarray['description'].'"}';
+            } else {
+                $app->response->setStatus(403);
+                echo 'false';
+            }
         }
     }
 });
