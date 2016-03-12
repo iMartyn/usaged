@@ -59,7 +59,10 @@ Class Logger {
         if ($query->execute()) {
             while ($result = $query->fetch()) {
                 $thisresult = array('inducteeuid'=>$result['inducteeuid'],'starttime'=>$result['starttime'],'endtime'=>$result['endtime']);
-                $secs = $result['seconds'];
+                $phpendtime = strtotime($result['endtime']);
+                $phpstarttime = strtotime($result['starttime']);
+                $secs = $phpendtime - $phpstarttime;
+                $mysqlsecs = $result['seconds'];
                 $thisresult['seconds'] = $secs;
                 $this->app->log->debug($secs);
                 $thisresult['nicetime'] = sprintf('%u seconds',$secs);
