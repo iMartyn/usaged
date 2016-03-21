@@ -1,19 +1,30 @@
 <DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8"/>
-        <title>LHS Machine availability</title>
-    </head>
-    <body>
-{% if machines %}
-        <h1>Leeds Hackspace Machine Status : </h1>
-        <ul>
-{% for machine in machines %}
-            <li> {{ machine.machinename }} is <div style="display: inline-block;background-color: #{{ machine.color }}">&nbsp;{{ machine.status }}&nbsp;</div> as reported by {{ machine.statusby }} at {{ machine.statuswhen }}</li>
-{% endfor %}
-        </ul>
-{% else %}
-        <h1>No machines available!</h1>
-{% endif %}
-    </body>
-</html>
+  <html>
+
+  <head>
+    <meta charset="utf-8" />
+    <title>LHS Machine availability</title>
+
+    <!-- Give me Bootstrap css from CDN -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  </head>
+
+  <body>
+    {% if machines %}
+    <h1>Leeds Hackspace Machine Status : </h1>
+    <ul>
+      {% for machine in machines %}
+      <ul class="list-group">
+        <li class="list-group-item">
+          <span class="label label-default label-pill pull-xs-right">{{ machine.status }}</span> {{ machine.machinename }} as reported by {{ machine.statusby }} at {{ machine.statuswhen }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <h1>No machines available!</h1> {% endif %}
+  </body>
+
+  <!-- Give me Bootstrap JS from CDN -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+  </html>
