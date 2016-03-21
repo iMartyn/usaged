@@ -90,15 +90,44 @@ $options = array(
         $result = $query->execute();
         $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
         if ($result !== TRUE) {
-            $this->app->log->debug('creating inducteemachine');
+            $this->app->log->debug('creating specialcards');
             $query = $this->pdo->prepare('CREATE TABLE `specialcards` (
                 `uid` varchar(36) NOT NULL,
                 `cardid` varchar(8) NOT NULL,
                 `description` varchar(255) NOT NULL,
+                `statusuid` varchar(36) NOT NULL,
                 PRIMARY KEY (`uid`))');
             $result = $query->execute();
             $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
         }
+        $query = $this->pdo->prepare('SELECT status FROM machines LIMIT 1');
+        $result = $query->execute();
+        $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
+        if ($result !== TRUE) {
+            $this->app->log->debug('adding status{,by,when} to machines');
+            $query = $this->pdo->prepare('ALTER TABLE `machines` ADD COLUMN (
+                `status` VARCHAR(36) NOT NULL DEFAULT "947e2a70-2fd3-42b3-ba4a-265f4ad722f2",
+                `statuswhen` datetime NOT NULL DEFAULT "00-00-00 00:00:00",
+                `statusby` VARCHAR(36) NOT NULL DEFAULT "00000000-0000-0000-0000-000000000000"
+            )');
+            $result = $query->execute();
+            $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
+            $this->app->log->debug('creating statuses');
+            $query = $this->pdo->prepare('CREATE TABLE `statuses` (
+                `uid` varchar(36) NOT NULL,
+                `description` varchar(255) NOT NULL,
+                `color` varchar(8) NOT NULL DEFAULT "#000000",
+                PRIMARY KEY (`uid`))');
+            $result = $query->execute();
+            $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
+            $this->app->log->debug('inserting statuses');
+            $query = $this->pdo->prepare('INSERT INTO `statuses` (`uid`,`description`,`color`) VALUES '.
+		'("947e2a70-2fd3-42b3-ba4a-265f4ad722f2","Working","008000"), '.
+                '("a4491b40-fdb1-4065-8225-c1f2d237678c","Out of order","ff0000"), '.
+                '("08723da1-87ec-4351-bd2d-7a479bd1bf90","Undergoing Maintenance","808000")');
+            $result = $query->execute();
+            $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
+       }            
     }
 
     public function __destruct() {

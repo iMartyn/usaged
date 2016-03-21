@@ -15,10 +15,18 @@ Class Machine {
 
     public function getAll() {
         $results = array();
-        $query = $this->db->prepare('SELECT uid,machinename FROM machines');
+        $query = $this->db->prepare('SELECT machines.uid,machinename,statuses.description as status,inductees.membername as statusby,statuswhen,statuses.color FROM machines '.
+            'LEFT JOIN statuses ON machines.status = statuses.uid '.
+            'LEFT JOIN inductees ON machines.statusby = inductees.uid');
         if ($query->execute()) {
             while ($result = $query->fetch()) {
-                $results[] = array('uid'=>$result['uid'],'machinename'=>$result['machinename']);
+                $results[] = array(
+                    'uid'=>$result['uid'],
+		    'machinename'=>$result['machinename'],
+		    'status'=>$result['status'],
+		    'statusby'=>$result['statusby'],
+		    'statuswhen'=>$result['statuswhen'],
+		    'color'=>$result['color']);
             }
         }
         return $results;
@@ -65,5 +73,12 @@ Class Machine {
             }
         }
         return $results;
+    }
+
+    public function setMachineStatus($uid,$status,$useruid) {
+        if ($this->getById($uid)) {
+            $query = $this->db->prepare('UPDATE machines SET machinestatus = :status, statusby = :useruid, statuswhen = now() WHERE uid = :uid');
+        }
+        return ($query->execute() != false);
     }
 }

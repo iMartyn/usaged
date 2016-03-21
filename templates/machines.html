@@ -2,14 +2,14 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <title>Machines available</title>
+        <title>LHS Machine availability</title>
     </head>
     <body>
 {% if machines %}
-        <h1>Machines : </h1>
+        <h1>Leeds Hackspace Machine Status : </h1>
         <ul>
 {% for machine in machines %}
-            <li> {{ machine.machinename }} </li>
+            <li> {{ machine.machinename }} is <div style="display: inline-block;background-color: #{{ machine.color }}">&nbsp;{{ machine.status }}&nbsp;</div> as reported by {{ machine.statusby }} at {{ machine.statuswhen }}</li>
 {% endfor %}
         </ul>
 {% else %}
