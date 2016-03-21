@@ -15,7 +15,7 @@
     <ul>
       {% for machine in machines %}
       <ul class="list-group">
-        <li class="list-group-item">
+        <li class="list-group-item-{{ machine.color }}">
           <span class="label label-default label-pill pull-xs-right">{{ machine.status }}</span> {{ machine.machinename }} as reported by {{ machine.statusby }} at {{ machine.statuswhen }}
         </li>
         {% endfor %}
