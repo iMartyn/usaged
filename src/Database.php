@@ -116,18 +116,29 @@ $options = array(
             $query = $this->pdo->prepare('CREATE TABLE `statuses` (
                 `uid` varchar(36) NOT NULL,
                 `description` varchar(255) NOT NULL,
-                `color` varchar(8) NOT NULL DEFAULT "#000000",
+                `class` varchar(20) NOT NULL DEFAULT "info",
                 PRIMARY KEY (`uid`))');
             $result = $query->execute();
             $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
             $this->app->log->debug('inserting statuses');
-            $query = $this->pdo->prepare('INSERT INTO `statuses` (`uid`,`description`,`color`) VALUES '.
-		'("947e2a70-2fd3-42b3-ba4a-265f4ad722f2","Working","008000"), '.
-                '("a4491b40-fdb1-4065-8225-c1f2d237678c","Out of order","ff0000"), '.
-                '("08723da1-87ec-4351-bd2d-7a479bd1bf90","Undergoing Maintenance","808000")');
+            $query = $this->pdo->prepare('INSERT INTO `statuses` (`uid`,`description`,`class`) VALUES '.
+		'("947e2a70-2fd3-42b3-ba4a-265f4ad722f2","Working","success"), '.
+                '("a4491b40-fdb1-4065-8225-c1f2d237678c","Out of order","danger"), '.
+                '("08723da1-87ec-4351-bd2d-7a479bd1bf90","Undergoing Maintenance","warning")');
             $result = $query->execute();
             $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
-       }            
+        }            
+/*        $query = $this->pdo->prepare('SELECT statusid FROM specialcards LIMIT 1');
+        $result = $query->execute();
+        $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
+        if ($result !== TRUE) {
+            $this->app->log->debug('adding statusid to specialcards');
+            $query = $this->pdo->prepare('ALTER TABLE `specialcards` ADD COLUMN (
+                `statusid` VARCHAR(36) NOT NULL DEFAULT "947e2a70-2fd3-42b3-ba4a-265f4ad722f2"
+            )');
+            $result = $query->execute();
+            $this->app->log->debug('result is '.gettype($result).' value '.(boolean)$result);
+        }*/
     }
 
     public function __destruct() {

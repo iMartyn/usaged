@@ -15,7 +15,7 @@ Class Machine {
 
     public function getAll() {
         $results = array();
-        $query = $this->db->prepare('SELECT machines.uid,machinename,statuses.description as status,inductees.membername as statusby,statuswhen,statuses.color FROM machines '.
+        $query = $this->db->prepare('SELECT machines.uid,machinename,statuses.description as status,inductees.membername as statusby,statuswhen,statuses.class FROM machines '.
             'LEFT JOIN statuses ON machines.status = statuses.uid '.
             'LEFT JOIN inductees ON machines.statusby = inductees.uid');
         if ($query->execute()) {
@@ -26,7 +26,7 @@ Class Machine {
 		    'status'=>$result['status'],
 		    'statusby'=>$result['statusby'],
 		    'statuswhen'=>$result['statuswhen'],
-		    'color'=>$result['color']);
+		    'class'=>$result['class']);
             }
         }
         return $results;
@@ -78,6 +78,13 @@ Class Machine {
     public function setMachineStatus($uid,$status,$useruid) {
         if ($this->getById($uid)) {
             $query = $this->db->prepare('UPDATE machines SET machinestatus = :status, statusby = :useruid, statuswhen = now() WHERE uid = :uid');
+        }
+        return ($query->execute() != false);
+    }
+
+    public function setStatusByCard($uid,$cardid,$userid) {
+        if ($this->getById($uid)) {
+            $query = $this->db->prepare('UPDATE machines SET machinestatus = (SELECT statusid from specialcards where cardid=:status), statusby = :useruid, statuswhen = now() WHERE uid = :uid');
         }
         return ($query->execute() != false);
     }
