@@ -77,15 +77,21 @@ Class Machine {
 
     public function setMachineStatus($uid,$status,$useruid) {
         if ($this->getById($uid)) {
-            $query = $this->db->prepare('UPDATE machines SET machinestatus = :status, statusby = :useruid, statuswhen = now() WHERE uid = :uid');
+            $query = $this->db->prepare('UPDATE machines SET status = :status, statusby = :useruid, statuswhen = now() WHERE uid = :uid');
         }
+        $query->bindParam(':uid',$uid);
+        $query->bindParam(':status',$status);
+        $query->bindParam(':useruid',$useruid);
         return ($query->execute() != false);
     }
 
     public function setStatusByCard($uid,$cardid,$userid) {
         if ($this->getById($uid)) {
-            $query = $this->db->prepare('UPDATE machines SET machinestatus = (SELECT statusid from specialcards where cardid=:status), statusby = :useruid, statuswhen = now() WHERE uid = :uid');
+            $query = $this->db->prepare('UPDATE machines SET status = (SELECT statusid from specialcards where cardid=:status), statusby = :useruid, statuswhen = now() WHERE uid = :uid');
         }
+        $query->bindParam(':uid',$uid);
+        $query->bindParam(':status',$status);
+        $query->bindParam(':useruid',$useruid);
         return ($query->execute() != false);
     }
 }
