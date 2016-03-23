@@ -61,20 +61,22 @@ Class Logger {
                 $thisresult = array('inducteeuid'=>$result['inducteeuid'],'starttime'=>$result['starttime'],'endtime'=>$result['endtime']);
                 $phpendtime = strtotime($result['endtime']);
                 $phpstarttime = strtotime($result['starttime']);
-                $secs = $phpendtime - $phpstarttime;
+                $totalsecs = $phpendtime - $phpstarttime;
                 $mysqlsecs = $result['seconds'];
                 $thisresult['seconds'] = $secs;
                 $this->app->log->debug($secs);
+
+                list($hours,$mins,$secs) = explode(',',date('H,i,s',$secs),3);
+
                 $thisresult['nicetime'] = sprintf('%u seconds',$secs);
-                if ($secs > 60) {
-                   list($mins,$secs) =explode(',',date('i,s',$secs),2);
-                   if ($mins > 60) {
-                       list($hours,$mins,$secs) = explode(',',date('H,i,s',$secs),3);
-                       $thisresult['nicetime'] = sprintf('%u hours, %u minutes and %u seconds',$hours,$mins,$secs);
-                   } else {
+
+                if ($totalsecs >= 60) {
                        $thisresult['nicetime'] = sprintf('%u minutes and %u seconds',$mins,$secs);
-                   }
-		}
+                }
+                if ($totalsecs >= 3600) {
+                       $thisresult['nicetime'] = sprintf('%u hours, %u minutes and %u seconds',$hours,$mins,$secs);
+                }
+
                 $results[] = $thisresult;
             }
             return $results;
