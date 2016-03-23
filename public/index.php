@@ -280,7 +280,7 @@ $app->get('/reportstatus/:machine/:inducteeid/:specialcardid', function ($machin
     $db = new Database;
     $machine = new Machine($db);
     $app->contentType('application/json');
-    if ($machine->setStatusByCard($machineuid,$inducteeid,$specialcardid)) {
+    if ($machine->setStatusByCard($machineuid,$specialcardid,$inducteeuid)) {
         $app->status(200);
         echo "true";
     } else {
@@ -289,5 +289,20 @@ $app->get('/reportstatus/:machine/:inducteeid/:specialcardid', function ($machin
     };
 });
 
+$app->get('/reportstatuscard/:machinename/:inducteecard/:specialcardid', function ($machinename,$inducteecardid,$specialcardid) use ($app) {
+    $db = new Database;
+    $machine = new Machine($db);
+    $machineuid = $machine->getByName($machinename)['uid'];
+    $inductee = new Inductee($db);
+    $inducteeuid = $inductee->getUidByCard($inducteecardid);
+    $app->contentType('application/json');
+    if ($machine->setStatusByCard($machineuid,$specialcardid,$inducteeuid)) {
+        $app->status(200);
+        echo "true";
+    } else {
+        $app->status(500);
+        echo "false";
+    };
+});
 // Run app
 $app->run();

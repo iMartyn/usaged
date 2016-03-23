@@ -1,6 +1,7 @@
 <?php
 namespace Usaged;
 
+use Slim\Slim;
 use Usaged\Database;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
@@ -8,10 +9,13 @@ use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
 Class Machine {
 
     private $db;
+    private $app;
 
     public function __construct(Database $db) {
         $this->db = $db->getPDO();
+        $this->app = Slim::getInstance();
     }
+
 
     public function getAll() {
         $results = array();
@@ -65,6 +69,7 @@ Class Machine {
 
     public function getById($uid) {
         $results = null;
+        $this->app->log->debug('getById SQL: SELECT uid,machinename FROM machines WHERE uid = '.$uid.' LIMIT 1');
         $query = $this->db->prepare('SELECT uid,machinename FROM machines WHERE uid = :uid LIMIT 1');
         $query->bindParam(':uid',$uid);
         if ($query->execute()) {
@@ -78,20 +83,26 @@ Class Machine {
     public function setMachineStatus($uid,$status,$useruid) {
         if ($this->getById($uid)) {
             $query = $this->db->prepare('UPDATE machines SET status = :status, statusby = :useruid, statuswhen = now() WHERE uid = :uid');
+            $query->bindParam(':uid',$uid);
+            $query->bindParam(':status',$status);
+            $query->bindParam(':useruid',$useruid);
+            return ($query->execute() != false);
+        } else {
+            return false;
         }
-        $query->bindParam(':uid',$uid);
-        $query->bindParam(':status',$status);
-        $query->bindParam(':useruid',$useruid);
-        return ($query->execute() != false);
     }
 
     public function setStatusByCard($uid,$cardid,$userid) {
+        $this->app->log->debug("Reached setStatusByCard($uid,$cardid,$userid)");
         if ($this->getById($uid)) {
-            $query = $this->db->prepare('UPDATE machines SET status = (SELECT statusid from specialcards where cardid=:status), statusby = :useruid, statuswhen = now() WHERE uid = :uid');
+            $this->app->log->debug("SQL : UPDATE machines SET status = (SELECT statusid from specialcards where cardid=$cardid), statusby = $userid, statuswhen = now() WHERE uid = $uid'");
+            $query = $this->db->prepare('UPDATE machines SET status = (SELECT statusid from specialcards where cardid=:cardid), statusby = :useruid, statuswhen = now() WHERE uid = :uid');
+            $query->bindParam(':uid',$uid);
+            $query->bindParam(':cardid',$cardid);
+            $query->bindParam(':useruid',$userid);
+            return ($query->execute() != false);
+        } else {
+            return false;
         }
-        $query->bindParam(':uid',$uid);
-        $query->bindParam(':status',$status);
-        $query->bindParam(':useruid',$useruid);
-        return ($query->execute() != false);
     }
 }
