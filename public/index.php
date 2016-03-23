@@ -243,7 +243,7 @@ $app->post('/log/bycard/:cardid', function ($cardid) use ($app) {
 });
 
 $app->get('/lastlog/:machinename', function ($machinename) use ($app) {
-    $db = new Database;
+    $db = new Database;	
     $log = new Logger($db);
     $machine = new Machine($db);
     $inductee = new Inductee($db);
@@ -273,6 +273,20 @@ $app->get('/lastlog/:machinename', function ($machinename) use ($app) {
     }
     $app->log->debug(json_encode($renderdata));
     $app->render('lastusage.html', $renderdata);
+});
+
+
+$app->get('/reportstatus/:machine/:inducteeid/:specialcardid', function ($machineuid,$inducteeuid,$specialcardid) use ($app) {
+    $db = new Database;
+    $machine = new Machine($db);
+    $app->contentType('application/json');
+    if ($machine->setStatusByCard($machineuid,$inducteeid,$specialcardid)) {
+        $app->status(200);
+        echo "true";
+    } else {
+        $app->status(500);
+        echo "false";
+    };
 });
 
 // Run app
